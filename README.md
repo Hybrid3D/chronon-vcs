@@ -5,7 +5,7 @@ especially Markdown. Every file gets its own linear, immutable history, and
 every commit carries a message explaining *why* it changed. It works alongside
 Git but neither calls nor replaces it.
 
-![People use the CLI directly. Agents use MCP (preferred) or CLI. Both access a selected vault through Chronon, which keeps a separate immutable history for each file.](https://raw.githubusercontent.com/Hybrid3D/chronon/main/docs/images/chronon-overview.png)
+![People use the CLI directly. Agents use MCP (preferred) or CLI. Both access a selected vault through Chronon, which keeps a separate immutable history for each file.](https://raw.githubusercontent.com/Hybrid3D/chronon-vcs/main/docs/images/chronon-overview.png)
 
 - **Vault**: a named collection of managed files, such as `knowledge` or
   `research`. People and agents refer to it by name from any directory.
@@ -24,7 +24,7 @@ Requires Python 3.11+ on macOS, Linux, WSL2, or Windows.
 uv tool install chronon-vcs   # or: pipx install chronon-vcs
 ```
 
-See [docs/installation.md](https://github.com/Hybrid3D/chronon/blob/main/docs/installation.md)
+See [docs/installation.md](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/installation.md)
 for GitHub tags, platform setup, and uninstalling.
 
 ## Quick start
@@ -48,7 +48,7 @@ A `chronon://<vault>/<path>` URI names the same file without `-v`/`--vault`:
 `chronon read chronon://knowledge/first-note.md` — handy for pointing at one
 file from anywhere, including in a message to someone else.
 
-Editing, diffs, and recovery are covered in the [CLI guide](https://github.com/Hybrid3D/chronon/blob/main/docs/cli.md).
+Editing, diffs, and recovery are covered in the [CLI guide](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/cli.md).
 
 ### Let an agent use it
 
@@ -78,7 +78,7 @@ prompt yourself:
 chronon agent-instructions --vault knowledge
 ```
 
-See [Agents and MCP](https://github.com/Hybrid3D/chronon/blob/main/docs/agents.md)
+See [Agents and MCP](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/agents.md)
 for `--allow-scratch` and the MCP equivalent, `get_agent_instructions`.
 
 ## How it works
@@ -96,12 +96,12 @@ for `--allow-scratch` and the MCP equivalent, `get_agent_instructions`.
 
 ## Documentation
 
-- [CLI guide](https://github.com/Hybrid3D/chronon/blob/main/docs/cli.md): editing
+- [CLI guide](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/cli.md): editing
   workflow, file states, revisions, vault registry, command reference
-- [Agents and MCP](https://github.com/Hybrid3D/chronon/blob/main/docs/agents.md):
+- [Agents and MCP](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/agents.md):
   `agent-setup`, permissions, MCP configuration, and expected agent behavior
-- [Installation](https://github.com/Hybrid3D/chronon/blob/main/docs/installation.md)
-- [Contributing](https://github.com/Hybrid3D/chronon/blob/main/CONTRIBUTING.md):
+- [Installation](https://github.com/Hybrid3D/chronon-vcs/blob/main/docs/installation.md)
+- [Contributing](https://github.com/Hybrid3D/chronon-vcs/blob/main/CONTRIBUTING.md):
   development setup and tests
 
 ## Data and backups

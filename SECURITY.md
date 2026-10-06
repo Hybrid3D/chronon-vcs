@@ -10,7 +10,7 @@
 ## Reporting a vulnerability
 
 Please do not open a public issue for a suspected vulnerability. Report it using
-[GitHub private vulnerability reporting](https://github.com/Hybrid3D/chronon/security/advisories/new).
+[GitHub private vulnerability reporting](https://github.com/Hybrid3D/chronon-vcs/security/advisories/new).
 
 Include the affected version, reproduction steps, impact, and any suggested
 mitigation. We will acknowledge a report within seven days and coordinate a fix

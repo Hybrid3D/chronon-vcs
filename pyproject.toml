@@ -33,10 +33,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Hybrid3D/chronon"
-Repository = "https://github.com/Hybrid3D/chronon"
-Issues = "https://github.com/Hybrid3D/chronon/issues"
-Changelog = "https://github.com/Hybrid3D/chronon/releases"
+Homepage = "https://github.com/Hybrid3D/chronon-vcs"
+Repository = "https://github.com/Hybrid3D/chronon-vcs"
+Issues = "https://github.com/Hybrid3D/chronon-vcs/issues"
+Changelog = "https://github.com/Hybrid3D/chronon-vcs/releases"
 
 [project.optional-dependencies]
 dev = [

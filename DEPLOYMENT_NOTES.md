@@ -26,7 +26,7 @@ silently guessed during preparation. It is not an end-user guide.
 - Keep optimistic concurrency tokens (`working_revision`) in both CLI and MCP,
   and use native inter-process file locks underneath them.
 - Do not publish, create a remote, tag, or change version `0.2.1` in this worktree.
-- Assume the public repository is `Hybrid3D/chronon`. That name is currently
+- Assume the public repository is `Hybrid3D/chronon-vcs`. That name is currently
   written into `pyproject.toml` and `README.md`; change both places together if
   a different owner/name is chosen.
 
@@ -59,7 +59,7 @@ silently guessed during preparation. It is not an end-user guide.
 ## Decisions to make before the first public release
 
 1. **Repository URL and package ownership.** `[project.urls]` now points at
-   `https://github.com/Hybrid3D/chronon`. Confirm that this is the final
+   `https://github.com/Hybrid3D/chronon-vcs`. Confirm that this is the final
    GitHub organization/repository, and that PyPI ownership of `chronon-vcs`
    matches, before the first tag is pushed.
 2. **Local-only versus portable history.** `.chronon/` is currently added to

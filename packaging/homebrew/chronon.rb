@@ -7,7 +7,7 @@ class Chronon < Formula
   include Language::Python::Virtualenv
 
   desc "Local, document-oriented immutable history indexed by time"
-  homepage "https://github.com/Hybrid3D/chronon"
+  homepage "https://github.com/Hybrid3D/chronon-vcs"
   # Placeholder until the first PyPI release. Replace both lines with the hashed
   # "Source" URL and checksum from https://pypi.org/project/chronon-vcs/#files;
   # `brew style` flags this URL form until that is done.

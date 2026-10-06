@@ -12,5 +12,5 @@ node -e 'require("sharp")("docs/images/chronon-overview.svg", { density: 144 }).
 ```
 
 The main README uses an absolute URL to the image in the public
-`Hybrid3D/chronon` repository, so it also works outside GitHub. Publish the
+`Hybrid3D/chronon-vcs` repository, so it also works outside GitHub. Publish the
 image at that URL before publishing package metadata that refers to it.
