@@ -82,7 +82,7 @@ def admin_vault_path(name: str) -> dict[str, str]:
     vaults = _list_vaults()
     if name not in vaults:
         raise InvalidArgument(
-            "no such vault", name=name, hint="run 'chronon list-vaults'"
+            "no such vault", name=name, hint="call list_vaults to see valid names"
         )
     return {"name": name, "path": vaults[name]}
 
@@ -379,7 +379,8 @@ class ChrononRepository:
                     resource=resource,
                     state=status["state"],
                     actual_revision=actual,
-                    hint="read the working copy and retry with --if-match",
+                    hint="read the working copy and retry with its working_revision as "
+                    "expected_revision",
                 )
             return
         if expected_revision != actual:
@@ -919,7 +920,7 @@ class ChrononRepository:
             raise ForeignChange(
                 "working copy was modified outside chronon",
                 resource=relative,
-                hint="commit it, accept it, or discard --force",
+                hint="commit it, accept it (accept_foreign), or discard it with force",
             )
         self._check_working_revision(relative, status, expected_revision)
         self._validate(relative, content)
@@ -957,46 +958,75 @@ class ChrononRepository:
                 result["created"] = False
                 return result
 
-            working = self.store.working_path(relative)
-            if working.exists():
-                raise FileError(
-                    "refusing to overwrite an untracked path",
-                    resource=relative,
-                    hint=f"run 'chronon add {relative}' first",
-                )
-            if expected_revision is not None:
-                raise RevisionConflict(
-                    "resource does not exist yet",
-                    resource=relative,
-                    expected_revision=expected_revision,
-                    actual_revision=None,
-                    hint="omit --if-match when creating a new resource",
-                )
-            if message is not None and not message.strip():
-                raise InvalidArgument(
-                    "commit message must not be empty", resource=relative
-                )
+            return self._create_locked(
+                relative, content, message, author, expected_revision
+            )
 
-            self._validate(relative, content)
-            atomic_write(working, content)
-            try:
-                self.store.add(relative)
-            except BaseException:
-                # This path did not exist before put(), so removing only this newly
-                # created file is safe if tracking metadata could not be initialized.
-                working.unlink(missing_ok=True)
-                raise
+    def create(
+        self,
+        resource: str | Path,
+        content: str,
+        message: str | None = None,
+        author: str | None = None,
+    ) -> dict[str, Any]:
+        """Create and track a new resource; fail if it already exists."""
+        resource = self._select(resource)
+        relative = self.store.normalize_resource(resource)
+        with resource_operation_lock(self.store, relative):
+            if self.store.is_tracked(relative):
+                raise ResourceAlreadyTracked(
+                    "resource already exists",
+                    resource=relative,
+                    hint="read it and update it with write_resource",
+                )
+            return self._create_locked(relative, content, message, author, None)
 
-            result: dict[str, Any] = {
-                "resource": relative,
-                "created": True,
-                "written": True,
-                "tracked": True,
-                "committed": False,
-            }
-            if message is not None:
-                result.update(self._commit_current(relative, message, author))
-            return self._with_working_state(result, relative)
+    def _create_locked(
+        self,
+        relative: str,
+        content: str,
+        message: str | None,
+        author: str | None,
+        expected_revision: str | None,
+    ) -> dict[str, Any]:
+        working = self.store.working_path(relative)
+        if working.exists():
+            raise FileError(
+                "refusing to overwrite an untracked path",
+                resource=relative,
+                hint=f"file exists on disk but is untracked; add {relative} to track it",
+            )
+        if expected_revision is not None:
+            raise RevisionConflict(
+                "resource does not exist yet",
+                resource=relative,
+                expected_revision=expected_revision,
+                actual_revision=None,
+                hint="omit the expected revision when creating a new resource",
+            )
+        if message is not None and not message.strip():
+            raise InvalidArgument("commit message must not be empty", resource=relative)
+
+        self._validate(relative, content)
+        atomic_write(working, content)
+        try:
+            self.store.add(relative)
+        except BaseException:
+            # This path did not exist before creation, so removing only this newly
+            # created file is safe if tracking metadata could not be initialized.
+            working.unlink(missing_ok=True)
+            raise
+
+        result: dict[str, Any] = {
+            "resource": relative,
+            "created": True,
+            "written": True,
+            "tracked": True,
+            "committed": False,
+        }
+        if message is not None:
+            result.update(self._commit_current(relative, message, author))
+        return self._with_working_state(result, relative)
 
     def discard(
         self,
@@ -1012,7 +1042,7 @@ class ChrononRepository:
                 raise ForeignChange(
                     "refusing to discard a change made outside chronon",
                     resource=relative,
-                    hint="use --force only if the external change may be lost",
+                    hint="pass force only if the external change may be lost",
                 )
             if status["state"] != "foreign" or expected_revision is not None:
                 self._check_working_revision(relative, status, expected_revision)
@@ -1080,7 +1110,8 @@ class ChrononRepository:
                 raise ForeignChange(
                     "refusing to overwrite a change made outside chronon",
                     resource=relative,
-                    hint="read status and retry with --if-match, or commit/accept the external change",
+                    hint="read status and retry with expected_revision, or commit/accept "
+                    "the external change",
                 )
             self._check_working_revision(relative, status, expected_revision)
             target, target_commit = self._content_at(relative, at)

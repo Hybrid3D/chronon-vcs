@@ -17,6 +17,7 @@ def test_mcp_exposes_manual_versioning_tools() -> None:
         "add_resource",
         "move_resource",
         "copy_resource",
+        "create_resource",
         "put_resource",
         "commit_resource",
         "diff_resource",
@@ -126,7 +127,7 @@ def test_mcp_can_initialize_and_create_a_resource(tmp_path: Path, monkeypatch) -
     monkeypatch.chdir(root)
     _, created = asyncio.run(
         mcp.call_tool(
-            "put_resource",
+            "create_resource",
             {
                 "resource": "notes.yml",
                 "content": "value: 1\n",
@@ -195,3 +196,32 @@ def test_mcp_get_agent_instructions_rejects_an_unknown_vault(
     )
 
     assert result["error"] == "invalid_argument"
+
+
+def test_mcp_write_resource_cannot_create_and_points_to_create_resource(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_repository(tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    _, result = asyncio.run(
+        mcp.call_tool("write_resource", {"resource": "new.md", "content": "x\n"})
+    )
+
+    assert result["error"] == "resource_not_tracked"
+    assert "create_resource" in result["hint"]
+    assert not (tmp_path / "new.md").exists()
+
+
+def test_mcp_create_resource_rejects_existing_resource(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_repository(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    args = {"resource": "a.md", "content": "one\n", "message": "first"}
+    asyncio.run(mcp.call_tool("create_resource", args))
+
+    _, again = asyncio.run(mcp.call_tool("create_resource", args))
+
+    assert again["error"] == "resource_already_tracked"
+    assert "write_resource" in again["hint"]

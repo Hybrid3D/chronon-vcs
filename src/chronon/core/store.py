@@ -83,7 +83,8 @@ def discover_root(start: str | Path | None = None) -> Path:
     raise RepositoryNotFound(
         "not inside a chronon repository",
         path=str(current),
-        hint="run 'chronon init [DIRECTORY]' first, or pass --vault <name>",
+        hint="name the vault to use (see list_vaults / 'chronon list-vaults'), "
+        "or initialize this directory first",
     )
 
 
@@ -129,7 +130,7 @@ def init_store(directory: str | Path = ".", mode: str = "manual") -> dict[str, A
             raise NotImplementedMode(
                 "auto commit mode is planned but not implemented",
                 mode=mode,
-                hint="initialize without --mode or use --mode manual",
+                hint="initialize in manual mode (the default)",
             )
         raise InvalidArgument("mode must be 'manual' or 'auto'", mode=mode)
 
@@ -313,7 +314,8 @@ class Store:
             raise ResourceNotTracked(
                 "resource is not tracked",
                 resource=relative,
-                hint=f"run 'chronon add {relative}'",
+                hint="create a new file with create_resource, or track a file that "
+                "already exists on disk with add_resource",
             )
         self.ensure_resource_id(relative)
         return relative

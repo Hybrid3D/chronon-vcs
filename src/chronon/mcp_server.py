@@ -25,7 +25,9 @@ mcp = FastMCP(
         "Chronon CLI, for managed resources. Use the exact user-selected vault "
         "name when needed; never guess. Before mutation, read the resource or "
         "status, retain working_revision, and pass it "
-        "as expected_revision. Prefer one-shot writes with a meaningful message. "
+        "as expected_revision. To create a NEW file use create_resource (no "
+        "expected_revision); write_resource only updates existing tracked files. "
+        "Prefer one-shot writes with a meaningful message. "
         "On revision_conflict, re-read and reconcile; never retry blindly. Any "
         "result with an error field is a failed operation. Call "
         "get_agent_instructions for the full text usage guide (optionally "
@@ -80,7 +82,10 @@ def add_resource(
     resource: str,
     vault: str | None = None,
 ) -> dict[str, Any]:
-    """Begin tracking an existing file in the current Chronon repository."""
+    """Start tracking a file that already exists on disk (does not write content).
+
+    To create a new file, use ``create_resource``.
+    """
     return _safe(lambda: ChrononRepository(vault=vault).add(resource))
 
 
@@ -109,6 +114,27 @@ def copy_resource(
 
 
 @mcp.tool()
+def create_resource(
+    resource: str,
+    content: str,
+    message: str | None = None,
+    author: str | None = None,
+    vault: str | None = None,
+) -> dict[str, Any]:
+    """Create and track a NEW file; fails if the path already exists.
+
+    Use this for the first write of a file. It needs no ``expected_revision``
+    because there is nothing to read yet. Supplying ``message`` also creates the
+    first immutable commit. To change an existing file, use ``write_resource``.
+    """
+    return _safe(
+        lambda: ChrononRepository(vault=vault).create(
+            resource, content, message, author
+        )
+    )
+
+
+@mcp.tool()
 def put_resource(
     resource: str,
     content: str,
@@ -117,11 +143,11 @@ def put_resource(
     expected_revision: str | None = None,
     vault: str | None = None,
 ) -> dict[str, Any]:
-    """Create and track a new resource, or safely update an existing one.
+    """DEPRECATED: use ``create_resource`` (new file) or ``write_resource`` (existing).
 
-    A new path must not already exist. Before updating scratch content, call
-    ``read_resource`` and pass its ``working_revision`` as ``expected_revision``.
-    Supplying ``message`` creates an immutable commit in the same operation.
+    Creates a new resource or updates a tracked one. Kept only for existing
+    clients; it will be removed in a future release. Do not pass
+    ``expected_revision`` when the path does not exist yet.
     """
     return _safe(
         lambda: ChrononRepository(vault=vault).put(
@@ -197,7 +223,11 @@ def write_resource(
     expected_revision: str | None = None,
     vault: str | None = None,
 ) -> dict[str, Any]:
-    """Validate and write; scratch content requires its working revision."""
+    """Replace the content of an EXISTING tracked file (read it first).
+
+    Pass the ``working_revision`` from ``read_resource`` as ``expected_revision``.
+    This cannot create a file: use ``create_resource`` for a new path.
+    """
     return _safe(
         lambda: ChrononRepository(vault=vault).write(
             resource, content, message, author, expected_revision

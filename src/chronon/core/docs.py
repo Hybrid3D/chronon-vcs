@@ -159,7 +159,10 @@ conflicts with the URI's vault is rejected rather than silently resolved."""
     mcp_rows = [
         f'| List managed files | `list_directory(directory="."{mcp_vault})` |',
         f'| Read current content | `read_resource(resource="<path>"{mcp_vault})` |',
-        f'| Start tracking a file | `add_resource(resource="<path>"{mcp_vault})` |',
+        "| Create a NEW file (first write; no revision needed) | "
+        f'`create_resource(resource="<path>", content="...", message="..."{mcp_vault})` |',
+        "| Start tracking a file that already exists on disk | "
+        f'`add_resource(resource="<path>"{mcp_vault})` |',
         f'| Rename a tracked file | `move_resource(source="<old>", '
         f'destination="<new>"{mcp_vault})` |',
         f'| Copy to a new independent resource | `copy_resource(source="<src>", '
@@ -172,7 +175,7 @@ conflicts with the URI's vault is rejected rather than silently resolved."""
             f'expected_revision="..."{mcp_vault})` |'
         )
     mcp_rows += [
-        "| Replace content + commit | "
+        "| Replace content of an existing file + commit | "
         f'`write_resource(resource="<path>", content="...", message="...", '
         f'expected_revision="..."{mcp_vault})` |',
         "| Change one structured value + commit | "
@@ -205,7 +208,9 @@ conflicts with the URI's vault is rejected rather than silently resolved."""
     cli_rows = [
         f"| List managed files | `{command} ls [directory]` |",
         f"| Read current content | `{command} read <path>` |",
-        f"| Start tracking a file | `{command} add <path>` |",
+        "| Create a NEW file (first write; no --if-match) | "
+        f'`{command} write <path> --stdin --message "..."` |',
+        f"| Start tracking a file already on disk | `{command} add <path>` |",
         f"| Rename a tracked file (keeps history) | `{command} mv <old> <new>` |",
         f"| Copy a tracked file to a new path | `{command} cp <src> <dst>` |",
     ]
@@ -299,6 +304,13 @@ conflicts with the URI's vault is rejected rather than silently resolved."""
   copied from.
 - Prefer one-shot writes with a commit message over separate save-then-commit;
   message cost is near zero for an agent, and it keeps history dense and useful.
+- Creating a NEW file is different from editing one: use `create_resource`
+  (CLI: `write` on a new path) with the full content and a commit message, and
+  pass no `expected_revision` / `--if-match` — there is nothing to read yet, and
+  supplying one fails. `write_resource` only updates files that are already
+  tracked and fails on a new path. `add_resource` only starts tracking a file that
+  already exists on disk; it never writes content. If the path exists, switch to
+  the read-then-write flow below. `put_resource` is deprecated; do not use it.
 - Before mutating a tracked file, read it or inspect status and retain the opaque
   `working_revision`. With MCP pass it back as `expected_revision`; with the CLI
   pass it as `--if-match`. On `revision_conflict`, re-read and reconcile; never

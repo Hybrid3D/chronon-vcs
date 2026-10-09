@@ -134,7 +134,7 @@ def _repository_root(path: str | Path) -> Path:
         raise FileError(
             "path is not a chronon repository",
             path=str(resolved),
-            hint="run 'chronon init' there first, or pass the repository root",
+            hint="initialize that directory first, or pass the repository root",
         )
     return resolved
 
@@ -166,7 +166,7 @@ def set_vault_path(name: str, path: str | Path) -> dict[str, Any]:
         vaults = _load()
         if name not in vaults:
             raise InvalidArgument(
-                "no such vault", name=name, hint="run 'chronon list-vaults'"
+                "no such vault", name=name, hint="call list_vaults to see valid names"
             )
         resolved = _repository_root(path)
         previous_path = vaults[name]
@@ -187,7 +187,7 @@ def remove_vault(name: str) -> dict[str, Any]:
         vaults = _load()
         if name not in vaults:
             raise InvalidArgument(
-                "no such vault", name=name, hint="run 'chronon list-vaults'"
+                "no such vault", name=name, hint="call list_vaults to see valid names"
             )
         del vaults[name]
         _save(vaults)
@@ -198,7 +198,7 @@ def resolve_vault(name: str) -> Path:
     vaults = _load()
     if name not in vaults:
         raise InvalidArgument(
-            "no such vault", name=name, hint="run 'chronon list-vaults'"
+            "no such vault", name=name, hint="call list_vaults to see valid names"
         )
     path = Path(vaults[name])
     if not (path / ".chronon" / "config.toml").is_file():
@@ -206,7 +206,7 @@ def resolve_vault(name: str) -> Path:
             "vault is registered but no longer a chronon repository",
             name=name,
             path=str(path),
-            hint=f"run 'chronon remove-vault {name}' or re-init at that path",
+            hint="ask the human administrator to repair or remove this vault",
         )
     return path
 

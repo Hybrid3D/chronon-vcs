@@ -87,6 +87,8 @@ def test_vault_template_is_specialized_for_one_vault() -> None:
     assert 'read_resource(resource="<path>", vault="knowledge")' in content
     assert 'write_resource(resource="<path>"' in content
     assert 'vault="knowledge")' in content
+    assert 'create_resource(resource="<path>", content="..."' in content
+    assert "put_resource` is deprecated" in content
     assert "direct filesystem tools" in content
     assert "<vault>" not in content
     assert "<selected-vault>" not in content

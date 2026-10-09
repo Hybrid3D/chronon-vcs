@@ -73,7 +73,7 @@ Generic client configuration:
 Every tool accepts an optional `vault` name. Tools cover setup
 (`list_vaults`, `add_vault`, `get_agent_instructions`, ...), reading
 (`read_resource`, `status_resource`, `diff_resource`, `history_resource`, ...),
-writing (`write_resource`, `set_value`, `commit_resource`, `move_resource`, ...),
+writing (`create_resource` (new files), `write_resource` (existing files), `set_value`, `commit_resource`, `move_resource`, ...),
 and recovery (`rollback_resource`, `discard_changes`, `accept_foreign`,
 `validate_resource`). A result with an `error` field is a failed operation even
 if the MCP call itself succeeded.
@@ -82,8 +82,9 @@ if the MCP call itself succeeded.
 
 1. Uses MCP if available, otherwise the CLI, without mixing them in one change.
 2. Uses the vault the user named and never guesses one.
-3. Reads first and keeps `working_revision`.
-4. Passes it as `expected_revision` (MCP) or `--if-match` (CLI) when writing.
+3. Creates a new file with `create_resource` (no revision needed); for an
+   existing file, reads first and keeps `working_revision`.
+4. Passes it as `expected_revision` (MCP) or `--if-match` (CLI) when updating.
 5. Checks the diff, validates, and commits with a meaningful message.
 6. On `revision_conflict`, re-reads and reconciles instead of retrying.
 
