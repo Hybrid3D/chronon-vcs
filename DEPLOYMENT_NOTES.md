@@ -75,7 +75,7 @@ silently guessed during preparation. It is not an end-user guide.
    minimal. Add `schema-show`, `schema-list`, and a guarded `schema-remove` after
    deciding whether historical commits retain the schema version used at commit
    time.
-5. **MCP SDK v2 migration.** The project deliberately remains on `mcp>=1.14,<2`.
+5. **MCP SDK v2 migration.** The project deliberately remains on `mcp>=1.21.1,<2`.
    The official v2 line is a major rewrite. Migrate in a dedicated change with
    protocol-level client tests rather than widening the dependency bound during
    release preparation.

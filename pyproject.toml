@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
   "filelock>=3.16,<4",
   "jsonschema>=4.23,<5",
-  "mcp>=1.14,<2",
+  "mcp>=1.21.1,<2",
   "PyYAML>=6.0.2,<7",
   "typer>=0.18,<1",
 ]

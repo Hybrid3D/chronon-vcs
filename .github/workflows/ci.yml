@@ -76,7 +76,7 @@ jobs:
           python -m pip install
           "filelock==3.16.0"
           "jsonschema==4.23.0"
-          "mcp==1.14.0"
+          "mcp==1.21.1"
           "PyYAML==6.0.2"
           "typer==0.18.0"
       - run: python -m pip install --no-deps .
